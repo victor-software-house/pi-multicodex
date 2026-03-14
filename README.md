@@ -1,8 +1,8 @@
-# @victor-software/pi-multicodex
+# @victor-software-house/pi-multicodex
 
 ![MultiCodex](./assets/multicodex.png)
 
-`@victor-software/pi-multicodex` is a pi extension for rotating multiple ChatGPT Codex OAuth accounts when using the `openai-codex-responses` API.
+`@victor-software-house/pi-multicodex` is a pi extension for rotating multiple ChatGPT Codex OAuth accounts when using the `openai-codex-responses` API.
 
 Current behavior:
 
@@ -14,7 +14,7 @@ Current behavior:
 ## Install
 
 ```bash
-pi install npm:@victor-software/pi-multicodex
+pi install npm:@victor-software-house/pi-multicodex
 ```
 
 Restart `pi` after installation.
@@ -58,7 +58,7 @@ This package is being turned into an independent fork with deliberate breaking c
 
 Current direction:
 
-- package name: `@victor-software/pi-multicodex`
+- package name: `@victor-software-house/pi-multicodex`
 - hard break from previous storage compatibility
 - Codex-only scope
 - independent implementation roadmap tracked in `fork-plan.md`

@@ -1,8 +1,8 @@
-# @victor-software/pi-multicodex fork plan
+# @victor-software-house/pi-multicodex fork plan
 
 ## Decisions locked in
 
-- **Package name:** `@victor-software/pi-multicodex`
+- **Package name:** `@victor-software-house/pi-multicodex`
 - **Command prefix:** keep current commands for now
   - `/multicodex-login`
   - `/multicodex-use`
@@ -145,7 +145,7 @@ If we want login-panel integration later, use a **dedicated custom provider** pl
 
 Goal: establish independent identity and remove upstream constraints before behavior changes.
 
-- [x] Rename package to `@victor-software/pi-multicodex`
+- [x] Rename package to `@victor-software-house/pi-multicodex`
 - [x] Update `repository`, `homepage`, `bugs`, and `author`
 - [x] Rewrite package description to reflect the fork
 - [x] Rewrite README as first-party project documentation
@@ -220,7 +220,7 @@ Goal: improve usability without pretending we can reuse built-in single-account 
 
 Goal: publish as a clearly independent hard-break package.
 
-- [ ] Ensure package name is `@victor-software/pi-multicodex`
+- [ ] Ensure package name is `@victor-software-house/pi-multicodex`
 - [ ] Ensure tarball contents are minimal
 - [ ] Run lint, typecheck, tests
 - [ ] Run `npm pack --dry-run`
