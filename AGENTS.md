@@ -28,3 +28,17 @@ npm run lint
 npm run tsgo
 npm run test
 ```
+
+Release validation:
+
+```bash
+npm pack --dry-run
+```
+
+## Commit Workflow
+
+- Do not batch unrelated changes into a single large commit.
+- Commit incrementally as each logical step is completed.
+- Use conventional commit messages such as `build: ...`, `docs: ...`, `refactor: ...`, and `release: ...`.
+- Before publishing, make sure the working tree is clean and all required checks pass.
+- Keep release commits focused on version bumps and release metadata only.

@@ -21,13 +21,20 @@ Restart `pi` after installation.
 
 ## Local development
 
-This repo uses `pnpm` for local development.
+This repo uses `mise` to pin tool versions and `pnpm` for dependency management.
 
 ```bash
+mise install
 pnpm install
-pnpm lint
-pnpm tsgo
-pnpm test
+pnpm check
+```
+
+Equivalent mise tasks:
+
+```bash
+mise run install
+mise run check
+mise run pack-dry
 ```
 
 Run the extension directly during local development:
@@ -63,8 +70,13 @@ Local development uses pnpm, but published package output must remain npm-compat
 Minimum release checks:
 
 ```bash
-pnpm lint
-pnpm tsgo
-pnpm test
+pnpm check
 npm pack --dry-run
+```
+
+Recommended release flow:
+
+```bash
+npm run publish:dry -- <version>
+npm run publish:release -- <version>
 ```
