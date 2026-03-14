@@ -1,0 +1,15 @@
+[tools]
+node = "24.14.0"
+pnpm = "10.32.1"
+
+[tasks.install]
+description = "Install project dependencies"
+run = "pnpm install"
+
+[tasks.check]
+description = "Run lint, typecheck, and tests"
+run = "pnpm check"
+
+[tasks.pack-dry]
+description = "Verify npm package contents"
+run = "npm pack --dry-run"
