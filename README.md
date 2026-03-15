@@ -69,11 +69,59 @@ Current direction:
 
 Current next step:
 
-- mirror the existing codex usage footer style, including support for displaying both reset countdowns
-- debounce expensive refresh work during rapid model cycling
-- move each reset countdown next to its matching usage period
-- add live preview to the `/multicodex-footer` panel before locking the final style
-- tighten footer updates so account switches and quota rotation are reflected immediately
+- refine the footer color palette with small visual adjustments only
+- document the account-rotation behavior contract explicitly
+- improve the `/multicodex-use` and `/multicodex-status` everyday UX
+
+## Behavior contract
+
+The current runtime behavior is:
+
+### Account selection priority
+
+1. Use the manual account selected with `/multicodex-use` when it is still available.
+2. Otherwise clear the stale manual override and select the best available managed account.
+3. Best-account selection prefers:
+   - untouched accounts with usage data
+   - then the account whose weekly reset window ends first
+   - then a random available account as fallback
+
+### Quota exhaustion semantics
+
+- Quota and rate-limit style failures are detected from provider error text.
+- When a request fails before any output is streamed, MultiCodex marks that account exhausted and retries on another account.
+- Exhaustion lasts until the next known reset time.
+- If usage data does not provide a reset time, exhaustion falls back to a 1 hour cooldown.
+
+### Retry policy
+
+- MultiCodex retries account rotation up to 5 times for a single request.
+- Retries only happen for quota/rate-limit style failures that occur before output is forwarded.
+- Once output has started streaming, the original error is surfaced instead of rotating.
+
+### Manual override behavior
+
+- `/multicodex-use <identifier>` sets the manual account override immediately.
+- `/multicodex-use` with no argument opens the account picker and sets the selected manual override.
+- Manual override is session-local state.
+- Manual override clears automatically when the selected account is no longer available or when it hits quota during rotation.
+
+### Usage cache and refresh rules
+
+- Usage is cached in memory for 5 minutes per account.
+- Footer updates render cached usage immediately and refresh in the background when needed.
+- Rapid `model_select` changes debounce background refresh work so non-Codex model switching clears the footer immediately.
+
+### Error classification
+
+Quota rotation currently treats these error classes as interchangeable:
+
+- HTTP `429`
+- `quota`
+- `usage limit`
+- `rate limit`
+- `too many requests`
+- `limit reached`
 
 ## Release validation
 

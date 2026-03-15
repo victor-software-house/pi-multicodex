@@ -58,56 +58,47 @@ Goal: finish the Codex footer so it feels like the built-in usage experience rat
 
 ### Remaining work
 
-- [ ] Debounce model-change refresh work so rapid `Ctrl+P` cycling never blocks on auth sync or usage fetches
-- [ ] Render each reset countdown next to its matching usage period instead of grouping them at the end
-- [ ] Add live preview inside the `/multicodex-footer` panel
-- [ ] Update the actual footer while footer settings change in the panel
-- [ ] Tune the footer color palette before locking the final style
-- [ ] Tighten footer updates so account switches and quota rotation are reflected immediately
-- [ ] Add tests for live preview updates, model-switch debouncing, and footer/account synchronization
+- [x] Debounce model-change refresh work so rapid `Ctrl+P` cycling never blocks on auth sync or usage fetches
+- [x] Render each reset countdown next to its matching usage period instead of grouping them at the end
+- [x] Add live preview inside the `/multicodex-footer` panel
+- [x] Update the actual footer while footer settings change in the panel
+- [x] Tune the footer color palette before locking the final style
+- [x] Tighten footer updates so account switches and quota rotation are reflected immediately
+- [x] Add tests for live preview updates, model-switch debouncing, and footer/account synchronization
 
-### Problems observed in current implementation
+### Footer milestone status
 
-These are the known rough edges that the next session should address first:
+The footer-polish work now covers:
 
-1. **Slow model switching**
-   - `model_select` currently triggers expensive footer refresh work.
-   - Rapid `Ctrl+P` cycling should not wait on auth sync or usage fetches.
-   - Desired fix: render from cached state immediately and debounce background refresh.
+1. **Model switching**
+   - `model_select` renders cached state immediately.
+   - Background refresh work is debounced so rapid `Ctrl+P` cycling does not block on auth sync or usage fetches.
+   - Non-Codex model selection clears the footer immediately.
 
 2. **Footer layout**
-   - Current reset countdown rendering groups countdowns at the end.
-   - Desired layout: each countdown should stay beside its matching usage period, for example:
+   - Each reset countdown now stays beside its matching usage period.
+   - Current layout target is:
      - `Codex 5h:31% used (↺2h27m) 7d:87% used (↺2d6h) victor@...`
 
 3. **Footer styling**
-   - Current colors are considered too noisy / low quality.
-   - Desired direction:
-     - labels and account dim/muted
-     - percentages use severity coloring
-     - preview before finalizing palette
+   - Labels stay dim.
+   - Brand, account, and reset countdowns stay muted.
+   - Percentages use severity coloring.
 
 4. **Footer settings UX**
-   - `/multicodex-footer` does not yet provide live preview while settings change.
-   - Desired behavior:
-     - preview line inside the panel updates immediately
-     - actual footer also updates live while panel is open
+   - `/multicodex-footer` now shows a live preview.
+   - The actual footer updates live while the panel is open.
 
 5. **Footer/account synchronization**
-   - Footer updates need to follow manual account changes and quota rotation more aggressively.
-   - Desired behavior:
-     - no stale account/usage combinations
-     - immediate footer update after active account switch
+   - Footer updates re-render immediately from cached state on account-manager state changes.
+   - This keeps account and usage combinations aligned during account switches, usage refreshes, and quota rotation.
 
 ## Suggested implementation order for the next session
 
-1. Add a small cached preview renderer for the footer line.
-2. Rework footer formatting so each reset countdown is attached to its own period.
-3. Add live preview inside `/multicodex-footer`.
-4. Make the real footer update live while the settings panel is open.
-5. Debounce `model_select` refresh and keep network refresh in the background.
-6. Tighten synchronization between active account changes and footer updates.
-7. Add tests for the above before releasing.
+1. Start the behavior-contract documentation milestone.
+2. Improve `/multicodex-use` picker and select-or-login flow.
+3. Improve `/multicodex-status` output for active state, cooldowns, and manual override visibility.
+4. Revisit footer colors only if real usage feedback shows readability issues.
 
 ## Follow-up milestone — behavior contract
 

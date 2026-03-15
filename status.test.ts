@@ -18,10 +18,11 @@ function createContext(overrides?: {
 	provider?: string;
 	setStatus?: ReturnType<typeof vi.fn>;
 	notify?: ReturnType<typeof vi.fn>;
+	color?: (token: string, text: string) => string;
 }) {
 	const setStatus = overrides?.setStatus ?? vi.fn();
 	const notify = overrides?.notify ?? vi.fn();
-	const color = (_token: string, text: string) => text;
+	const color = overrides?.color ?? ((_token: string, text: string) => text);
 	return {
 		hasUI: true,
 		model: {
@@ -91,6 +92,55 @@ describe("formatActiveAccountStatus", () => {
 		expect(text).toContain("7d:20% used");
 		expect(text).not.toContain("a@example.com");
 		expect(text).not.toContain("↺");
+	});
+
+	it("uses a muted palette for the brand, account, and reset countdowns", () => {
+		const ctx = createContext({
+			color: (token: string, text: string) => `[${token}:${text}]`,
+		});
+		const text = formatActiveAccountStatus(
+			ctx,
+			"a@example.com",
+			{
+				primary: { usedPercent: 25, resetAt: Date.now() + 60_000 },
+				secondary: { usedPercent: 95, resetAt: Date.now() + 120_000 },
+				fetchedAt: 0,
+			},
+			defaultPreferences,
+		);
+
+		expect(text).toContain("[muted:Codex]");
+		expect(text).toContain("[muted:a@example.com]");
+		expect(text).toContain("[dim:5h:]");
+		expect(text).toContain("[muted:(↺");
+		expect(text).toContain("[success:75% left]");
+		expect(text).toContain("[error:5% left]");
+	});
+
+	it("uses muted loading text and dim unknown percentages", () => {
+		const ctx = createContext({
+			color: (token: string, text: string) => `[${token}:${text}]`,
+		});
+		const loading = formatActiveAccountStatus(
+			ctx,
+			"a@example.com",
+			undefined,
+			defaultPreferences,
+		);
+		const unknown = formatActiveAccountStatus(
+			ctx,
+			"a@example.com",
+			{
+				primary: { resetAt: Date.now() + 60_000 },
+				secondary: { resetAt: Date.now() + 120_000 },
+				fetchedAt: 0,
+			},
+			defaultPreferences,
+		);
+
+		expect(loading).toContain("[muted:Codex]");
+		expect(loading).toContain("[muted:loading...]");
+		expect(unknown).toContain("[dim:--]");
 	});
 });
 

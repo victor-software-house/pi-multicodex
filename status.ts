@@ -23,6 +23,7 @@ const SETTINGS_FILE = path.join(os.homedir(), ".pi", "agent", "settings.json");
 const REFRESH_INTERVAL_MS = 60_000;
 const MODEL_SELECT_REFRESH_DEBOUNCE_MS = 250;
 const UNKNOWN_PERCENT = "--";
+const BRAND_LABEL = "Codex";
 const FIVE_HOUR_LABEL = "5h:";
 const SEVEN_DAY_LABEL = "7d:";
 
@@ -139,13 +140,21 @@ function usedToDisplayPercent(
 	return mode === "left" ? left : clampPercent(100 - left);
 }
 
+function formatBrand(ctx: ExtensionContext): string {
+	return ctx.ui.theme.fg("muted", BRAND_LABEL);
+}
+
+function formatLoading(ctx: ExtensionContext): string {
+	return ctx.ui.theme.fg("muted", "loading...");
+}
+
 function formatPercent(
 	ctx: ExtensionContext,
 	displayPercent: number | undefined,
 	mode: PercentDisplayMode,
 ): string {
 	if (typeof displayPercent !== "number" || Number.isNaN(displayPercent)) {
-		return ctx.ui.theme.fg("muted", UNKNOWN_PERCENT);
+		return ctx.ui.theme.fg("dim", UNKNOWN_PERCENT);
 	}
 
 	const text = `${Math.round(clampPercent(displayPercent))}% ${mode}`;
@@ -201,7 +210,7 @@ function formatUsageSegment(
 	if (showReset) {
 		const countdown = formatResetCountdown(resetAt);
 		if (countdown) {
-			parts.push(ctx.ui.theme.fg("dim", `(↺${countdown})`));
+			parts.push(ctx.ui.theme.fg("muted", `(↺${countdown})`));
 		}
 	}
 	return parts.join(" ");
@@ -221,11 +230,7 @@ export function formatActiveAccountStatus(
 		? ctx.ui.theme.fg("muted", accountEmail)
 		: undefined;
 	if (!usage) {
-		return [
-			ctx.ui.theme.fg("dim", "Codex"),
-			accountText,
-			ctx.ui.theme.fg("dim", "loading..."),
-		]
+		return [formatBrand(ctx), accountText, formatLoading(ctx)]
 			.filter(Boolean)
 			.join(" ");
 	}
@@ -249,8 +254,8 @@ export function formatActiveAccountStatus(
 
 	const leading =
 		preferences.order === "account-first"
-			? [ctx.ui.theme.fg("dim", "Codex"), accountText]
-			: [ctx.ui.theme.fg("dim", "Codex")];
+			? [formatBrand(ctx), accountText]
+			: [formatBrand(ctx)];
 	const trailing =
 		preferences.order === "account-first" ? [] : [accountText].filter(Boolean);
 
@@ -498,7 +503,7 @@ export function createUsageStatusController(accountManager: AccountManager) {
 		draft: FooterPreferences,
 	): string {
 		const previewText =
-			getStatusText(ctx, draft) ?? ctx.ui.theme.fg("dim", "Codex loading...");
+			getStatusText(ctx, draft) ?? `${formatBrand(ctx)} ${formatLoading(ctx)}`;
 		return `${theme.fg("dim", "Preview")}: ${previewText}`;
 	}
 
