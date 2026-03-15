@@ -67,6 +67,8 @@ MultiCodex adds a live footer to your session showing the active account, 5-hour
 
 You can customize which fields appear and their ordering with `/multicodex footer`.
 
+![MultiCodex footer settings](./assets/screenshots/multicodex-footer-settings.png)
+
 ## What it does under the hood
 
 - **Provider override.** MultiCodex registers itself as the `openai-codex` provider. You do not need to select a different provider or change your model — it works with whatever Codex model you already use.

@@ -21,6 +21,12 @@ ACCENT = (225, 196, 125)  # 38:2:1:225:196:125
 DIM = (75, 75, 75)  # 38:2:1:75:75:75
 SUCCESS = (166, 211, 147)  # 38:2:1:166:211:147
 
+PADDING_X = 28
+PADDING_Y = 24
+LINE_HEIGHT = 44
+FOOTER_LINE_HEIGHT = 38
+FONT_SIZE = 36
+
 
 @dataclass(frozen=True)
 class Screen:
@@ -50,34 +56,56 @@ def text_width(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.ImageFont) 
 	return right - left
 
 
+def create_canvas(width: int, height: int) -> tuple[Image.Image, ImageDraw.ImageDraw]:
+	image = Image.new("RGB", (width, height), BG)
+	return image, ImageDraw.Draw(image)
+
+
+def draw_segmented_text(
+	draw: ImageDraw.ImageDraw,
+	x: int,
+	y: int,
+	font: ImageFont.ImageFont,
+	segments: list[tuple[str, tuple[int, int, int]]],
+) -> None:
+	x_cursor = x
+	for text, color in segments:
+		draw.text((x_cursor, y), text, fill=color, font=font)
+		x_cursor += text_width(draw, text, font)
+
+
 def draw_colored_footer(
 	draw: ImageDraw.ImageDraw,
 	x: int,
 	y: int,
 	font: ImageFont.ImageFont,
-	screen: Screen,
+	account_label: str,
+	five_hour_usage: str,
+	seven_day_usage: str,
 ) -> None:
-	x_cursor = x
-	segments = [
-		("Codex", DIM),
-		(" · ", DIM),
-		(screen.five_hour_usage, SUCCESS),
-		(" · ", DIM),
-		(screen.seven_day_usage, SUCCESS),
-		(" · ", DIM),
-		(screen.account_label, DEFAULT),
-	]
-	for segment, color in segments:
-		draw.text((x_cursor, y), segment, fill=color, font=font)
-		x_cursor += text_width(draw, segment, font)
+	draw_segmented_text(
+		draw,
+		x,
+		y,
+		font,
+		[
+			("Codex", DIM),
+			(" · ", DIM),
+			(five_hour_usage, SUCCESS),
+			(" · ", DIM),
+			(seven_day_usage, SUCCESS),
+			(" · ", DIM),
+			(account_label, DEFAULT),
+		],
+	)
 
 
-def draw_screen(screen: Screen, font: ImageFont.ImageFont) -> None:
-	padding_x = 28
-	padding_y = 24
-	line_height = 44
-	footer_line_height = 38
+def save_image(image: Image.Image, filename: str) -> None:
+	OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+	image.save(OUTPUT_DIR / filename)
 
+
+def draw_standard_screen(screen: Screen, font: ImageFont.ImageFont) -> None:
 	sample_lines = [
 		screen.title,
 		*screen.lines,
@@ -90,26 +118,29 @@ def draw_screen(screen: Screen, font: ImageFont.ImageFont) -> None:
 	max_chars = max(len(line) for line in sample_lines)
 	char_width = 22
 	content_width = max_chars * char_width
-	width = max(1600, content_width + padding_x * 2)
+	width = max(1600, content_width + PADDING_X * 2)
 	height = (
-		padding_y
+		PADDING_Y
 		+ 40
 		+ 26
-		+ line_height
-		+ len(screen.lines) * line_height
+		+ LINE_HEIGHT
+		+ len(screen.lines) * LINE_HEIGHT
 		+ 30
-		+ footer_line_height * 3
-		+ padding_y
+		+ FOOTER_LINE_HEIGHT * 3
+		+ PADDING_Y
 	)
 
-	image = Image.new("RGB", (width, height), BG)
-	draw = ImageDraw.Draw(image)
+	image, draw = create_canvas(width, height)
 
-	top_border_y = padding_y
-	draw.line((padding_x, top_border_y, width - padding_x, top_border_y), fill=ACCENT, width=2)
+	top_border_y = PADDING_Y
+	draw.line(
+		(PADDING_X, top_border_y, width - PADDING_X, top_border_y),
+		fill=ACCENT,
+		width=2,
+	)
 
 	title_y = top_border_y + 28
-	draw.text((padding_x + 6, title_y), screen.title, fill=ACCENT, font=font)
+	draw.text((PADDING_X + 6, title_y), screen.title, fill=ACCENT, font=font)
 
 	start_y = title_y + 60
 	for index, line in enumerate(screen.lines):
@@ -119,18 +150,155 @@ def draw_screen(screen: Screen, font: ImageFont.ImageFont) -> None:
 			color = DIM
 		else:
 			color = DEFAULT
-		draw.text((padding_x + 6, start_y + index * line_height), line, fill=color, font=font)
+		draw.text((PADDING_X + 6, start_y + index * LINE_HEIGHT), line, fill=color, font=font)
 
-	bottom_border_y = start_y + len(screen.lines) * line_height + 16
-	draw.line((padding_x, bottom_border_y, width - padding_x, bottom_border_y), fill=ACCENT, width=2)
+	bottom_border_y = start_y + len(screen.lines) * LINE_HEIGHT + 16
+	draw.line(
+		(PADDING_X, bottom_border_y, width - PADDING_X, bottom_border_y),
+		fill=ACCENT,
+		width=2,
+	)
 
 	footer_y = bottom_border_y + 24
-	draw.text((padding_x + 6, footer_y), screen.footer_path, fill=DIM, font=font)
-	draw.text((padding_x + 6, footer_y + footer_line_height), screen.footer_status, fill=DIM, font=font)
-	draw_colored_footer(draw, padding_x + 6, footer_y + footer_line_height * 2, font, screen)
+	draw.text((PADDING_X + 6, footer_y), screen.footer_path, fill=DIM, font=font)
+	draw.text(
+		(PADDING_X + 6, footer_y + FOOTER_LINE_HEIGHT),
+		screen.footer_status,
+		fill=DIM,
+		font=font,
+	)
+	draw_colored_footer(
+		draw,
+		PADDING_X + 6,
+		footer_y + FOOTER_LINE_HEIGHT * 2,
+		font,
+		screen.account_label,
+		screen.five_hour_usage,
+		screen.seven_day_usage,
+	)
 
-	OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-	image.save(OUTPUT_DIR / screen.filename)
+	save_image(image, screen.filename)
+
+
+def draw_footer_settings_screen(font: ImageFont.ImageFont) -> None:
+	filename = "multicodex-footer-settings.png"
+	title = "MultiCodex Footer"
+	subtitle = "Configure the usage footer to match the codex usage extension style."
+	footer_path = "~/workspace/<org>/pi-multicodex (main)"
+	footer_status = "↑612k ↓67k R26M W346k $12.199 (sub) 67.0%/272k (auto)            (openai-codex) gpt-5.4 • high"
+	account_label = "account-01@example.test"
+	five_hour_usage = "5h:68% left (↺14m)"
+	seven_day_usage = "7d:90% left (↺6d19h)"
+
+	lines_for_width = [
+		title,
+		subtitle,
+		"Preview: Codex · 5h:68% left (↺14m) · 7d:90% left (↺6d19h) · account-01@example.test",
+		"→ Usage display         left",
+		"  Reset countdown window  both",
+		"  Show account            on",
+		"  Show reset countdown    on",
+		"  Footer order            usage-first",
+		"  Show remaining or consumed quota percentages",
+		"  Type to search · Enter/Space to change · Esc to cancel",
+		footer_path,
+		footer_status,
+		account_label,
+		five_hour_usage,
+		seven_day_usage,
+	]
+	char_width = 22
+	width = max(1800, max(len(line) for line in lines_for_width) * char_width + PADDING_X * 2)
+	height = 920
+
+	image, draw = create_canvas(width, height)
+
+	top_border_y = PADDING_Y
+	draw.line(
+		(PADDING_X, top_border_y, width - PADDING_X, top_border_y),
+		fill=ACCENT,
+		width=2,
+	)
+
+	y = top_border_y + 28
+	draw.text((PADDING_X + 6, y), title, fill=ACCENT, font=font)
+	y += 60
+	draw.text((PADDING_X + 6, y), subtitle, fill=DIM, font=font)
+	y += 52
+	draw_segmented_text(
+		draw,
+		PADDING_X + 6,
+		y,
+		font,
+		[
+			("Preview", DIM),
+			(": ", DEFAULT),
+			("Codex", DIM),
+			(" · ", DIM),
+			(five_hour_usage, SUCCESS),
+			(" · ", DIM),
+			(seven_day_usage, SUCCESS),
+			(" · ", DIM),
+			(account_label, DEFAULT),
+		],
+	)
+	y += 64
+
+	settings_data = [
+		("→ ", "Usage display", "left", True),
+		("  ", "Reset countdown window", "both", False),
+		("  ", "Show account", "on", False),
+		("  ", "Show reset countdown", "on", False),
+		("  ", "Footer order", "usage-first", False),
+	]
+	label_max = max(len(label) for _, label, _, _ in settings_data)
+	value_col = PADDING_X + 6 + text_width(draw, "→ " + "x" * label_max + "  ", font)
+	for prefix, label, value, selected in settings_data:
+		label_color = ACCENT if selected else DEFAULT
+		value_color = ACCENT if selected else DIM
+		prefix_color = ACCENT if selected else DEFAULT
+		draw.text((PADDING_X + 6, y), prefix, fill=prefix_color, font=font)
+		px = PADDING_X + 6 + text_width(draw, prefix, font)
+		draw.text((px, y), label, fill=label_color, font=font)
+		draw.text((value_col, y), value, fill=value_color, font=font)
+		y += LINE_HEIGHT
+
+	y += 18
+	draw.text(
+		(PADDING_X + 44, y),
+		"Show remaining or consumed quota percentages",
+		fill=DIM,
+		font=font,
+	)
+	y += 68
+	draw.text(
+		(PADDING_X + 44, y),
+		"Type to search · Enter/Space to change · Esc to cancel",
+		fill=DIM,
+		font=font,
+	)
+
+	bottom_border_y = height - (FOOTER_LINE_HEIGHT * 3 + 46)
+	draw.line(
+		(PADDING_X, bottom_border_y, width - PADDING_X, bottom_border_y),
+		fill=ACCENT,
+		width=2,
+	)
+
+	footer_y = bottom_border_y + 24
+	draw.text((PADDING_X + 6, footer_y), footer_path, fill=DIM, font=font)
+	draw.text((PADDING_X + 6, footer_y + FOOTER_LINE_HEIGHT), footer_status, fill=DIM, font=font)
+	draw_colored_footer(
+		draw,
+		PADDING_X + 6,
+		footer_y + FOOTER_LINE_HEIGHT * 2,
+		font,
+		account_label,
+		five_hour_usage,
+		seven_day_usage,
+	)
+
+	save_image(image, filename)
 
 
 SCREENS = [
@@ -196,7 +364,8 @@ SCREENS = [
 
 
 if __name__ == "__main__":
-	font = load_font(36)
+	font = load_font(FONT_SIZE)
 	for screen in SCREENS:
-		draw_screen(screen, font)
-	print(f"Wrote {len(SCREENS)} synthetic screenshots to {OUTPUT_DIR}")
+		draw_standard_screen(screen, font)
+	draw_footer_settings_screen(font)
+	print(f"Wrote {len(SCREENS) + 1} synthetic screenshots to {OUTPUT_DIR}")
