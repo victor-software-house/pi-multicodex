@@ -430,7 +430,7 @@ export function createUsageStatusController(accountManager: AccountManager) {
 				createSettingsItems(draft),
 				7,
 				getSettingsListTheme(),
-				(id, newValue) => {
+				(id: string, newValue: string) => {
 					draft = applyPreferenceChange(draft, id, newValue);
 					settingsList.updateValue(id, newValue);
 				},

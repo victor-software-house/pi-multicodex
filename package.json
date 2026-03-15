@@ -62,6 +62,9 @@
 		"@mariozechner/pi-ai": "*",
 		"@mariozechner/pi-coding-agent": "*"
 	},
+	"dependencies": {
+		"@mariozechner/pi-tui": "^0.58.1"
+	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.7",
 		"@mariozechner/pi-ai": "^0.58.1",
