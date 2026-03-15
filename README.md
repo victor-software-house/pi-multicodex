@@ -2,252 +2,119 @@
 
 ![MultiCodex main panel](./assets/screenshots/multicodex-main.png)
 
-`@victor-software-house/pi-multicodex` is a pi extension that rotates multiple ChatGPT Codex OAuth accounts for the `openai-codex-responses` API.
+MultiCodex is a [pi](https://github.com/badlogic/pi-mono) extension that manages multiple ChatGPT Codex accounts and rotates between them automatically when you hit quota limits.
 
-## What it does
+You add your Codex accounts once. After that, MultiCodex transparently picks the account with the most remaining quota for every request. When one account runs dry mid-session, it switches to another and retries — no manual intervention needed.
 
-- overrides the normal `openai-codex` path instead of requiring a separate provider to be selected
-- auto-imports pi's stored `openai-codex` auth when it is new or changed
-- rotates accounts on quota and rate-limit failures
-- prefers untouched accounts when usage data is available
-- otherwise prefers the account whose weekly window resets first
-- keeps the implementation focused on Codex account rotation
+## Getting started
 
-## Why teams pick it
-
-- one operator command family instead of scattered commands (`/multicodex ...`)
-- account operations are fast in-session (`/multicodex use` picker with `Backspace` remove + confirmation)
-- non-UI operations are available for inspection and recovery (`show`, `verify`, `path`, `reset`, `help`)
-- settings and account state use stable local paths under `~/.pi/agent/`
-- release and quality checks are automated through CI and semantic-release
-
-## Install
+Install from npm:
 
 ```bash
 pi install npm:@victor-software-house/pi-multicodex
 ```
 
-Restart `pi` after installation.
+Restart pi. That is all you need — MultiCodex takes over the normal `openai-codex` provider path and auto-imports any Codex auth you have already set up in pi.
+
+To manage your accounts inside a session, type `/multicodex`.
+
+## How it works
+
+When you start a session, MultiCodex:
+
+1. Imports your existing pi Codex auth automatically (if present).
+2. Checks usage data across all managed accounts.
+3. Picks the account with the most headroom — preferring untouched accounts first, then the one whose weekly reset window ends soonest.
+
+When a request hits a quota or rate limit **before** any output is streamed, MultiCodex marks that account exhausted, picks the next available one, and retries the request. This happens up to 5 times transparently. Once output has started streaming, the error is surfaced as-is.
+
+## Commands
+
+Everything lives under one command: `/multicodex`.
+
+| Command | What it does |
+|---|---|
+| `/multicodex` | Open the main interactive menu |
+| `/multicodex show` | Print account status and cached usage |
+| `/multicodex use [identifier]` | Activate an account, or open the picker if no identifier given |
+| `/multicodex footer` | Configure the usage footer display |
+| `/multicodex rotation` | Show the current rotation policy |
+| `/multicodex verify` | Check that local storage paths are writable |
+| `/multicodex path` | Print storage and settings file locations |
+| `/multicodex reset [manual\|quota\|all]` | Clear manual override, quota cooldowns, or both |
+| `/multicodex help` | Print a compact usage line |
+
+All subcommands support dynamic autocomplete. `/multicodex use` also autocompletes from your managed account list.
+
+Commands that do not need a UI panel (`show`, `verify`, `path`, `reset`, `help`) work in non-interactive mode too.
+
+## Account picker
+
+The `/multicodex use` picker lets you select, add, and remove accounts in one place.
+
+![MultiCodex use picker](./assets/screenshots/multicodex-use-picker.png)
+
+- **Enter** activates the highlighted account.
+- **Backspace** removes it (after confirmation).
+
+When you remove an active account, MultiCodex switches to the next available one automatically.
+
+![MultiCodex remove account confirmation](./assets/screenshots/multicodex-remove-confirm.png)
+
+## Usage footer
+
+MultiCodex adds a live footer to your session showing the active account, 5-hour and 7-day usage percentages, and reset countdowns. The footer updates after every turn and on account switches.
+
+You can customize which fields appear and their ordering with `/multicodex footer`.
+
+## What it does under the hood
+
+- **Provider override.** MultiCodex registers itself as the `openai-codex` provider. You do not need to select a different provider or change your model — it works with whatever Codex model you already use.
+- **Auth import.** When pi has stored Codex OAuth credentials, MultiCodex imports them automatically. You can also add accounts manually with `/multicodex use <email>`.
+- **Token refresh.** OAuth tokens are refreshed before expiry so requests do not fail due to stale credentials.
+- **Usage tracking.** Usage data is fetched from the Codex API and cached for 5 minutes per account. The footer renders cached data immediately and refreshes in the background.
+- **Quota cooldown.** When an account is exhausted, it stays on cooldown until its next known reset time (or 1 hour if the reset time is unknown).
 
 ## Local development
 
-This repo uses `mise` to pin tools and `pnpm` for dependency management.
+This repo uses `mise` for tool versions and `pnpm` for dependency management.
 
 ```bash
-mise install
-pnpm install
-pnpm check
+mise install          # pin tool versions
+pnpm install          # install dependencies
+pnpm check            # lint + typecheck + test
+npm pack --dry-run    # verify package contents
 ```
 
-Equivalent mise tasks:
-
-```bash
-mise run install
-mise run check
-mise run pack-dry
-```
-
-Run the extension directly during local development:
+Run the extension directly during development:
 
 ```bash
 pi -e ./index.ts
 ```
 
-## Command family
+## Data storage
 
-The extension now uses one command family:
+MultiCodex stores all data locally under `~/.pi/agent/`:
 
-- `/multicodex`
-  - open the main interactive UI
-- `/multicodex show`
-  - show managed account status and cached usage
-- `/multicodex use [identifier]`
-  - with an identifier, activate existing auth or trigger login
-  - with no identifier, open the account picker
-  - in the picker, `Backspace` removes the highlighted account after confirmation
-- `/multicodex footer`
-  - open footer settings in interactive mode
-  - show footer settings summary in non-interactive mode
-- `/multicodex rotation`
-  - show current hard-coded rotation policy
-- `/multicodex verify`
-  - verify writable local paths and report runtime summary
-- `/multicodex path`
-  - show storage and settings file paths
-- `/multicodex reset [manual|quota|all]`
-  - reset manual override state, quota cooldown state, or both
-- `/multicodex help`
-  - print compact usage text
+| File | Contents |
+|---|---|
+| `codex-accounts.json` | Managed account credentials and state |
+| `settings.json` (key `pi-multicodex`) | Footer display preferences |
 
-Dynamic autocomplete is available for subcommands and for `/multicodex use <identifier>`.
-
-## Screenshots
-
-All screenshots below are synthetic renders from sanitized control-sequence layouts. They reflect the current command family and footer coloring without exposing real credentials.
-
-### `/multicodex use` account picker
-
-![MultiCodex use picker](./assets/screenshots/multicodex-use-picker.png)
-
-### Remove account confirmation
-
-![MultiCodex remove account confirmation](./assets/screenshots/multicodex-remove-confirm.png)
-
-## Architecture overview
-
-The implementation is currently organized around these modules:
-
-- `provider.ts`
-  - overrides the normal `openai-codex` provider path
-  - mirrors Codex models and installs the managed stream wrapper
-- `stream-wrapper.ts`
-  - account selection, retry, and quota-rotation path during streaming
-- `account-manager.ts`
-  - managed account storage, token refresh, usage cache, activation logic, and auth import sync
-- `auth.ts`
-  - reads pi's `~/.pi/agent/auth.json` and extracts importable `openai-codex` OAuth state
-- `status.ts`
-  - footer rendering, footer settings persistence, footer settings panel, and footer status refresh logic
-- `commands.ts`
-  - `/multicodex` command-family routing, autocomplete, and account-selection flows
-- `hooks.ts`
-  - session-start and session-switch refresh behavior
-- `storage.ts`
-  - persisted account state in `~/.pi/agent/codex-accounts.json`
-
-## Project direction
-
-This project is maintained as its own package and release line.
-
-Current direction:
-
-- package name: `@victor-software-house/pi-multicodex`
-- Codex-only scope
-- local account state stored at `~/.pi/agent/codex-accounts.json`
-- footer and future extension settings stored under `pi-multicodex` in `~/.pi/agent/settings.json`
-- internal logic split into focused modules today, with a broader shared controller planned next
-- current roadmap tracked in `ROADMAP.md`
-
-Current next milestones:
-
-1. Persist footer settings immediately instead of waiting for panel close.
-2. Add configurable rotation settings and document the rotation behavior contract.
-3. Broaden the current footer controller into a shared MultiCodex controller.
-4. Improve imported-account labels by deriving email identity safely when possible.
-
-## Behavior contract
-
-The current runtime behavior is:
-
-### Account selection priority
-
-1. Use the manual account selected with `/multicodex use` when it is still available.
-2. Otherwise clear the stale manual override and select the best available managed account.
-3. Best-account selection prefers:
-   - untouched accounts with usage data
-   - then the account whose weekly reset window ends first
-   - then a random available account as fallback
-
-### Quota exhaustion semantics
-
-- Quota and rate-limit style failures are detected from provider error text.
-- When a request fails before any output is streamed, MultiCodex marks that account exhausted and retries on another account.
-- Exhaustion lasts until the next known reset time.
-- If usage data does not provide a reset time, exhaustion falls back to a 1 hour cooldown.
-
-### Retry policy
-
-- MultiCodex retries account rotation up to 5 times for a single request.
-- Retries only happen for quota and rate-limit style failures that occur before output is forwarded.
-- Once output has started streaming, the original error is surfaced instead of rotating.
-
-### Manual override behavior
-
-- `/multicodex use <identifier>` sets the manual account override immediately.
-- `/multicodex use` with no argument opens the account picker and sets the selected manual override.
-- Manual override is session-local state.
-- Manual override clears automatically when the selected account is no longer available or when it hits quota during rotation.
-
-### Usage cache and refresh rules
-
-- Usage is cached in memory for 5 minutes per account.
-- Footer updates render cached usage immediately and refresh in the background when needed.
-- Rapid `model_select` changes debounce background refresh work so non-Codex model switching clears the footer immediately.
-
-### Error classification
-
-Quota rotation currently treats these error classes as interchangeable:
-
-- HTTP `429`
-- `quota`
-- `usage limit`
-- `rate limit`
-- `too many requests`
-- `limit reached`
-
-## Release validation
-
-Minimum release checks:
-
-```bash
-pnpm check
-npm pack --dry-run
-```
+No data is sent anywhere except to the Codex API endpoints for auth refresh and usage queries.
 
 ## Release process
 
-This repository uses `semantic-release` with npm trusted publishing.
+Releases are automated. Push a conventional commit to `main` and GitHub Actions handles versioning, changelog, npm publishing (via trusted publishing), and GitHub releases.
 
-Maintainer flow:
+Local push protection via `lefthook` runs the same checks as CI before every push.
 
-1. Write Conventional Commits.
-2. The local `commit-msg` hook validates commit messages with Lefthook + commitlint.
-3. CI validates commit messages again and runs release checks.
-4. Merge to `main`.
-5. GitHub Actions runs `semantic-release` from `.github/workflows/publish.yml`.
-6. `semantic-release` computes the next version, creates the git tag and GitHub release, updates `package.json` and `CHANGELOG.md`, and publishes to npm through trusted publishing.
+## Roadmap
 
-Local verification:
-
-```bash
-pnpm check
-npm pack --dry-run
-pnpm release:dry
-```
-
-Local push protection:
-
-- `lefthook` runs `mise run pre-push`
-- the `pre-push` mise task runs the same core validations as CI:
-  - `pnpm check`
-  - `npm pack --dry-run`
-
-Do not use local `npm publish` for normal releases in this repo.
-
-## npm trusted publishing setup
-
-npm-side setup is required in addition to the workflow.
-
-Trusted publisher mapping:
-
-- package: `@victor-software-house/pi-multicodex`
-- repository: `victor-founder/pi-multicodex`
-- workflow file: `.github/workflows/publish.yml`
-
-Useful commands:
-
-```bash
-npm trust list @victor-software-house/pi-multicodex
-script -q /dev/null bash -lc 'npm trust github @victor-software-house/pi-multicodex --repository victor-founder/pi-multicodex --file publish.yml --yes'
-```
-
-## Related docs
-
-- `ROADMAP.md` for planned milestones and acceptance criteria
-- `AGENTS.md` for repository-specific agent guidance
+See [ROADMAP.md](ROADMAP.md) for planned work including configurable rotation settings, a shared controller architecture, and immediate footer persistence.
 
 ## Acknowledgment
 
 This project descends from earlier MultiCodex work. Thanks to the original creator for the starting point that made this package possible.
 
-The active-account usage footer work also draws on ideas from `calesennett/pi-codex-usage`. Thanks to its author for the reference implementation and footer design.
+The usage footer draws on ideas from [calesennett/pi-codex-usage](https://github.com/calesennett/pi-codex-usage). Thanks to its author for the reference implementation and footer design.
