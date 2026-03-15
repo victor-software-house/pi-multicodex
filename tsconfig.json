@@ -11,6 +11,7 @@
 	"include": [
 		"index.ts",
 		"index.test.ts",
+		"selection.ts",
 		"storage.ts",
 		"usage.ts",
 		"vitest.config.ts"
