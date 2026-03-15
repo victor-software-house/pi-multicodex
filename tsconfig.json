@@ -15,6 +15,7 @@
 		"commands.ts",
 		"hooks.ts",
 		"index.ts",
+		"stream-wrapper.ts",
 		"index.test.ts",
 		"selection.ts",
 		"storage.ts",
