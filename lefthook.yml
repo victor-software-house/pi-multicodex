@@ -1,0 +1,5 @@
+pre-push:
+  parallel: false
+  commands:
+    ci-checks:
+      run: mise run pre-push

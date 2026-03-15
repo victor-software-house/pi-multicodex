@@ -2,10 +2,14 @@
 node = "24.14.0"
 bun = "1.3.10"
 pnpm = "10.32.1"
+lefthook = "1.11.12"
 
 [tasks.install]
-description = "Install project dependencies"
-run = "pnpm install"
+description = "Install project dependencies and git hooks"
+run = '''
+pnpm install
+lefthook install
+'''
 
 [tasks.check]
 description = "Run lint, typecheck, and tests"
@@ -14,3 +18,10 @@ run = "pnpm check"
 [tasks.pack-dry]
 description = "Verify npm package contents"
 run = "npm pack --dry-run"
+
+[tasks.pre-push]
+description = "Run the same core validations as the publish workflow"
+run = '''
+pnpm check
+npm pack --dry-run >/dev/null
+'''

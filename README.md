@@ -94,11 +94,10 @@ Release flow:
 
 Local push protection:
 
-- `scripts/pre-push.sh` runs the same core validations as the publish workflow:
-  - `mise x -- pnpm check`
-  - `mise x -- npm pack --dry-run`
-- the local git hook at `.git/hooks/pre-push` calls that script
-- when pushing a `v*` tag, the hook also verifies that the tag version matches `package.json`
+- `lefthook` runs `mise run pre-push`
+- the `pre-push` mise task runs the same core validations as the publish workflow:
+  - `pnpm check`
+  - `npm pack --dry-run`
 
 Prepare locally:
 
