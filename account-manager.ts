@@ -195,6 +195,21 @@ export class AccountManager {
 		}
 	}
 
+	clearAllQuotaExhaustion(): number {
+		let cleared = 0;
+		for (const account of this.data.accounts) {
+			if (account.quotaExhaustedUntil) {
+				account.quotaExhaustedUntil = undefined;
+				cleared += 1;
+			}
+		}
+		if (cleared > 0) {
+			this.save();
+			this.notifyStateChanged();
+		}
+		return cleared;
+	}
+
 	removeAccount(email: string): boolean {
 		const index = this.data.accounts.findIndex(
 			(account) => account.email === email,

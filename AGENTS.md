@@ -20,7 +20,7 @@ The current codebase is organized around these responsibilities:
 - `status.ts`
   - footer rendering, footer settings persistence, footer settings panel, and footer refresh behavior
 - `commands.ts`
-  - current slash command registrations and account-selection flows
+  - `/multicodex` command-family routing, autocomplete, and account-selection flows
 - `hooks.ts`
   - session-start and session-switch refresh behavior
 - `storage.ts`
@@ -30,10 +30,16 @@ The current codebase is organized around these responsibilities:
 
 - MultiCodex owns the normal `openai-codex` provider path directly.
 - pi's stored `openai-codex` auth is auto-imported when new or changed.
-- Current shipped commands are:
-  - `/multicodex-use [identifier]`
-  - `/multicodex-status`
-  - `/multicodex-footer`
+- Current shipped command family is:
+  - `/multicodex`
+  - `/multicodex show`
+  - `/multicodex use [identifier]`
+  - `/multicodex footer`
+  - `/multicodex rotation`
+  - `/multicodex verify`
+  - `/multicodex path`
+  - `/multicodex reset [manual|quota|all]`
+  - `/multicodex help`
 - Footer settings are persisted in `~/.pi/agent/settings.json` under `pi-multicodex`.
 - Rotation criteria are still hard-coded.
 
@@ -41,22 +47,17 @@ The current codebase is organized around these responsibilities:
 
 When continuing work, prioritize these items before expanding scope:
 
-1. Replace the three top-level commands with one `/multicodex` command family.
-2. Add dynamic autocomplete for subcommands and managed account identifiers.
-3. Make the zero-argument command open the main UI.
-4. Make account selection and status flows consistently actionable.
-5. Add `show`, `footer`, `rotation`, `verify`, `path`, `reset`, and `help` subcommands.
-6. Persist footer settings immediately instead of waiting until panel close.
-7. Add rotation settings and document the rotation behavior contract.
-8. Broaden the current footer controller into a shared MultiCodex controller.
-9. Replace imported-account fallback labels with real email identity when it can be derived safely.
+1. Persist footer settings immediately instead of waiting until panel close.
+2. Add rotation settings and document the rotation behavior contract.
+3. Broaden the current footer controller into a shared MultiCodex controller.
+4. Replace imported-account fallback labels with real email identity when it can be derived safely.
+5. Keep command-family UX cohesive and avoid adding parallel top-level commands.
 
-## Command migration policy
+## Command family policy
 
-- Move to the `/multicodex` command family as soon as it is ready.
-- Remove `/multicodex-use`, `/multicodex-status`, and `/multicodex-footer` in the same change.
-- Do not keep backward-compatibility aliases for the old commands.
-- Update README, ROADMAP, tests, and release notes together when the command migration lands.
+- Keep `/multicodex` as the only operator command surface.
+- Do not reintroduce `/multicodex-use`, `/multicodex-status`, or `/multicodex-footer` aliases.
+- When command UX changes, update README, ROADMAP, tests, and release notes together.
 
 ## Goals
 

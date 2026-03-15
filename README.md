@@ -45,46 +45,33 @@ Run the extension directly during local development:
 pi -e ./index.ts
 ```
 
-## Current commands
+## Command family
 
-These commands reflect the current shipped implementation:
-
-- `/multicodex-use [identifier]`
-  - Use an existing managed account, or start the Codex login flow when the account is missing or the stored auth is no longer valid.
-  - With no argument, opens an account picker.
-- `/multicodex-status`
-  - Show managed account state and cached usage information.
-- `/multicodex-footer`
-  - Open an interactive panel to configure footer fields and ordering.
-
-## Planned command migration
-
-The next user-facing milestone is a command-surface migration to one command family:
+The extension now uses one command family:
 
 - `/multicodex`
   - open the main interactive UI
 - `/multicodex show`
-  - show runtime state and active-account summary
+  - show managed account status and cached usage
 - `/multicodex use [identifier]`
-  - choose or activate an account
+  - with an identifier, activate existing auth or trigger login
+  - with no identifier, open the account picker
+  - in the picker, `Backspace` removes the highlighted account after confirmation
 - `/multicodex footer`
-  - open footer settings
+  - open footer settings in interactive mode
+  - show footer settings summary in non-interactive mode
 - `/multicodex rotation`
-  - open rotation settings
+  - show current hard-coded rotation policy
 - `/multicodex verify`
-  - verify runtime health and local storage access
+  - verify writable local paths and report runtime summary
 - `/multicodex path`
-  - show config and storage paths
-- `/multicodex reset`
-  - reset selected extension state
+  - show storage and settings file paths
+- `/multicodex reset [manual|quota|all]`
+  - reset manual override state, quota cooldown state, or both
 - `/multicodex help`
   - print compact usage text
 
-Migration policy:
-
-- the old top-level commands will be removed once `/multicodex` is ready
-- no backward-compatibility aliases are planned
-- README, roadmap, tests, and release notes will move together in the same change
+Dynamic autocomplete is available for subcommands and for `/multicodex use <identifier>`.
 
 ## Architecture overview
 
@@ -102,7 +89,7 @@ The implementation is currently organized around these modules:
 - `status.ts`
   - footer rendering, footer settings persistence, footer settings panel, and footer status refresh logic
 - `commands.ts`
-  - current slash command registrations and account-selection flows
+  - `/multicodex` command-family routing, autocomplete, and account-selection flows
 - `hooks.ts`
   - session-start and session-switch refresh behavior
 - `storage.ts`
@@ -123,12 +110,10 @@ Current direction:
 
 Current next milestones:
 
-1. Replace the split command surface with the `/multicodex` command family.
-2. Add dynamic autocomplete for subcommands and managed account identifiers.
-3. Make account inspection and selection consistently actionable.
-4. Persist footer settings immediately instead of waiting for panel close.
-5. Add configurable rotation settings and document the rotation behavior contract.
-6. Broaden the current footer controller into a shared MultiCodex controller.
+1. Persist footer settings immediately instead of waiting for panel close.
+2. Add configurable rotation settings and document the rotation behavior contract.
+3. Broaden the current footer controller into a shared MultiCodex controller.
+4. Improve imported-account labels by deriving email identity safely when possible.
 
 ## Behavior contract
 
@@ -136,7 +121,7 @@ The current runtime behavior is:
 
 ### Account selection priority
 
-1. Use the manual account selected with `/multicodex-use` when it is still available.
+1. Use the manual account selected with `/multicodex use` when it is still available.
 2. Otherwise clear the stale manual override and select the best available managed account.
 3. Best-account selection prefers:
    - untouched accounts with usage data
@@ -158,8 +143,8 @@ The current runtime behavior is:
 
 ### Manual override behavior
 
-- `/multicodex-use <identifier>` sets the manual account override immediately.
-- `/multicodex-use` with no argument opens the account picker and sets the selected manual override.
+- `/multicodex use <identifier>` sets the manual account override immediately.
+- `/multicodex use` with no argument opens the account picker and sets the selected manual override.
 - Manual override is session-local state.
 - Manual override clears automatically when the selected account is no longer available or when it hits quota during rotation.
 

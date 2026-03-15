@@ -19,15 +19,12 @@ The current shipped behavior is:
 
 - MultiCodex overrides the normal `openai-codex` provider path directly.
 - MultiCodex auto-imports pi's stored `openai-codex` OAuth auth when it is new or changed.
-- `/multicodex-use [identifier]` is the current account entrypoint.
-  - with an identifier: use existing account or start login when missing or stale
-  - with no argument: open account picker
-- `/multicodex-status` shows managed account state.
-- `/multicodex-footer` opens the footer settings panel.
+- MultiCodex uses one `/multicodex` command family with subcommands.
+- `/multicodex use` opens the account picker, supports account removal via `Backspace`, and supports `/multicodex use <identifier>` for direct activation.
+- `/multicodex show`, `/multicodex verify`, `/multicodex path`, `/multicodex reset`, and `/multicodex help` are available without opening a panel.
 - Footer settings are stored in `~/.pi/agent/settings.json` under `pi-multicodex`.
 - Managed account storage is stored in `~/.pi/agent/codex-accounts.json`.
 - Rotation criteria are still hard-coded.
-- Status and picker flows are still split across multiple commands.
 
 ## Operating principles
 
@@ -58,15 +55,9 @@ The current shipped behavior is:
 
 ## Command model decision
 
-The extension is moving from several top-level commands to one operator command family.
+The extension now uses one operator command family.
 
-### Current command model
-
-- `/multicodex-use [identifier]`
-- `/multicodex-status`
-- `/multicodex-footer`
-
-### Target command model
+### Shipped command model
 
 - `/multicodex`
   - open the main interactive UI
@@ -77,22 +68,21 @@ The extension is moving from several top-level commands to one operator command 
 - `/multicodex footer`
   - open footer settings
 - `/multicodex rotation`
-  - open rotation settings
+  - show current rotation behavior summary
 - `/multicodex verify`
   - verify runtime health and config access
 - `/multicodex path`
   - show config and storage paths
-- `/multicodex reset`
+- `/multicodex reset [manual|quota|all]`
   - reset selected extension state
 - `/multicodex help`
   - print compact usage text
 
-### Migration rules
+### Migration rules applied
 
-- Remove `/multicodex-use`, `/multicodex-status`, and `/multicodex-footer` as soon as `/multicodex` is ready.
-- Do not keep compatibility aliases.
-- Update README, ROADMAP, tests, and release notes in the same change.
-- Treat command-family migration as a user-facing breaking change and release it accordingly.
+- `/multicodex-use`, `/multicodex-status`, and `/multicodex-footer` were removed with no compatibility aliases.
+- README, ROADMAP, tests, and command implementation were updated in the same change.
+- The command migration remains a user-facing breaking change and should be released accordingly.
 
 ## Current milestone — command-family migration and operator UX
 
@@ -100,15 +90,15 @@ Goal: replace the split command surface with one coherent operator API and make 
 
 ### Work items
 
-- [ ] Replace `/multicodex-use`, `/multicodex-status`, and `/multicodex-footer` with one `/multicodex` command family
-- [ ] Make `/multicodex` with no arguments open the main interactive UI
-- [ ] Add subcommands: `show`, `use`, `footer`, `rotation`, `verify`, `path`, `reset`, `help`
-- [ ] Add dynamic autocomplete for subcommands
-- [ ] Add dynamic autocomplete for `/multicodex use <identifier>` from managed accounts
-- [ ] Keep `show`, `verify`, `path`, `reset`, and `help` usable without opening a panel
-- [ ] Ensure non-interactive contexts return short operational messages instead of trying to open pickers or panels
-- [ ] Remove references to `/login` from notifications and docs when MultiCodex owns the account flow directly
-- [ ] Update tests to cover the new command-family behavior and autocomplete
+- [x] Replace `/multicodex-use`, `/multicodex-status`, and `/multicodex-footer` with one `/multicodex` command family
+- [x] Make `/multicodex` with no arguments open the main interactive UI
+- [x] Add subcommands: `show`, `use`, `footer`, `rotation`, `verify`, `path`, `reset`, `help`
+- [x] Add dynamic autocomplete for subcommands
+- [x] Add dynamic autocomplete for `/multicodex use <identifier>` from managed accounts
+- [x] Keep `show`, `verify`, `path`, `reset`, and `help` usable without opening a panel
+- [x] Ensure non-interactive contexts return short operational messages instead of trying to open pickers or panels
+- [x] Remove references to `/login` from notifications and docs when MultiCodex owns the account flow directly
+- [x] Update tests to cover the new command-family behavior and autocomplete
 
 ### UX acceptance criteria
 
@@ -177,7 +167,7 @@ Goal: finish the footer experience so it matches the new command model and follo
 
 ### Remaining work
 
-- [ ] Move footer settings access under `/multicodex footer`
+- [x] Move footer settings access under `/multicodex footer`
 - [ ] Persist footer settings immediately on each change instead of waiting until panel close
 - [ ] Re-read normalized settings after save when needed so the UI reflects persisted truth
 - [ ] Add a non-UI footer summary path under `/multicodex show` or `/multicodex help` where useful

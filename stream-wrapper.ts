@@ -101,7 +101,7 @@ export function createStreamWrapper(
 					}
 					if (!account) {
 						throw new Error(
-							"No available Multicodex accounts. Please use /multicodex-use <identifier>.",
+							"No available Multicodex accounts. Please use /multicodex use <identifier>.",
 						);
 					}
 
