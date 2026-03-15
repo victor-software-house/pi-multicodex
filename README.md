@@ -1,6 +1,6 @@
 # @victor-software-house/pi-multicodex
 
-![MultiCodex](./assets/multicodex.png)
+![MultiCodex main panel](./assets/screenshots/multicodex-main.png)
 
 `@victor-software-house/pi-multicodex` is a pi extension that rotates multiple ChatGPT Codex OAuth accounts for the `openai-codex-responses` API.
 
@@ -80,6 +80,18 @@ The extension now uses one command family:
   - print compact usage text
 
 Dynamic autocomplete is available for subcommands and for `/multicodex use <identifier>`.
+
+## Screenshots
+
+All screenshots below are synthetic renders from sanitized control-sequence layouts. They reflect the current command family and footer coloring without exposing real credentials.
+
+### `/multicodex use` account picker
+
+![MultiCodex use picker](./assets/screenshots/multicodex-use-picker.png)
+
+### Remove account confirmation
+
+![MultiCodex remove account confirmation](./assets/screenshots/multicodex-remove-confirm.png)
 
 ## Architecture overview
 
