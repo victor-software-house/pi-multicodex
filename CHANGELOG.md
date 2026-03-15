@@ -1,3 +1,10 @@
+## [2.0.4](https://github.com/victor-software-house/pi-multicodex/compare/v2.0.3...v2.0.4) (2026-03-15)
+
+
+### Bug Fixes
+
+* correct rotation logic description in README ([12a9533](https://github.com/victor-software-house/pi-multicodex/commit/12a953378edb4202a62f699779657ff70ad1e3a1))
+
 ## [2.0.3](https://github.com/victor-software-house/pi-multicodex/compare/v2.0.2...v2.0.3) (2026-03-15)
 
 
