@@ -11,6 +11,7 @@
 	"include": [
 		"abort-utils.ts",
 		"account-manager.ts",
+		"browser.ts",
 		"index.ts",
 		"index.test.ts",
 		"selection.ts",

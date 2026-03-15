@@ -25,6 +25,7 @@ import type {
 } from "@mariozechner/pi-coding-agent";
 import { createLinkedAbortController } from "./abort-utils";
 import { AccountManager } from "./account-manager";
+import { openLoginInBrowser } from "./browser";
 import { formatResetAt, isUsageUntouched } from "./usage";
 
 // =============================================================================
@@ -129,36 +130,6 @@ function withProvider(
 		return { ...event, error: { ...event.error, provider } };
 	}
 	return event;
-}
-
-async function openLoginInBrowser(
-	pi: ExtensionAPI,
-	ctx: ExtensionCommandContext,
-	url: string,
-): Promise<void> {
-	let command: string;
-	let args: string[];
-
-	if (process.platform === "darwin") {
-		command = "open";
-		args = [url];
-	} else if (process.platform === "win32") {
-		command = "cmd";
-		args = ["/c", "start", "", url];
-	} else {
-		command = "xdg-open";
-		args = [url];
-	}
-
-	try {
-		await pi.exec(command, args);
-	} catch (error) {
-		ctx.ui.notify(
-			"Could not open a browser automatically. Please open the login URL manually.",
-			"warning",
-		);
-		console.warn("[multicodex] Failed to open browser:", error);
-	}
 }
 
 // =============================================================================
