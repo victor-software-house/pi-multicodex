@@ -117,8 +117,32 @@ Local push protection via `lefthook` runs the same checks as CI before every pus
 
 See [ROADMAP.md](ROADMAP.md) for planned work including configurable rotation settings, a shared controller architecture, and immediate footer persistence.
 
-## Acknowledgment
+## Prior art and how this project differs
 
-This project descends from earlier MultiCodex work. Thanks to the original creator for the starting point that made this package possible.
+This extension builds on ideas from two earlier pi extensions. Both deserve credit for establishing the patterns that made this project possible.
 
-The usage footer draws on ideas from [calesennett/pi-codex-usage](https://github.com/calesennett/pi-codex-usage). Thanks to its author for the reference implementation and footer design.
+### [kim0/pi-multicodex](https://github.com/kim0/pi-multicodex)
+
+The original MultiCodex extension by [kim0](https://github.com/kim0). It introduced the core concept: manage multiple Codex OAuth accounts and rotate between them on quota failures. The original shipped as a single `index.ts` file (~990 lines) with three top-level commands (`/multicodex-login`, `/multicodex-use`, `/multicodex-status`), a stream wrapper for transparent retries, and account selection logic that prefers untouched accounts and earliest weekly resets.
+
+This fork diverged significantly:
+
+- **Modular architecture.** Split into 16 focused modules (~2,400 lines of runtime code, ~1,200 lines of tests) instead of one monolithic file.
+- **Command family.** One `/multicodex` command with subcommands and dynamic autocomplete, replacing three separate top-level commands.
+- **Account removal.** In-session account deletion from the picker via `Backspace` with confirmation — the original had no way to remove accounts without editing the JSON file.
+- **Non-interactive mode.** All inspection and recovery subcommands (`show`, `verify`, `path`, `reset`, `help`) work without a UI panel.
+- **Auth import.** Automatically imports pi's stored `openai-codex` credentials when they change, so existing pi logins work without re-entering them.
+- **Token refresh.** Proactively refreshes OAuth tokens before expiry instead of failing on stale credentials.
+- **Automated releases.** semantic-release with npm trusted publishing, commitlint, lefthook pre-push checks, and CI validation on every push.
+
+### [calesennett/pi-codex-usage](https://github.com/calesennett/pi-codex-usage)
+
+A footer-only extension by [calesennett](https://github.com/calesennett) that shows Codex usage windows in the pi status bar. It introduced the idea of a live footer displaying 5-hour and 7-day usage percentages with reset countdowns, and offered two commands to toggle display mode and reset window.
+
+This project incorporated and extended that footer concept:
+
+- **Integrated footer.** The usage footer is part of the rotation extension rather than a separate install, so it always reflects the active rotated account.
+- **More settings.** Five configurable fields (usage mode, reset window, show account, show reset countdown, footer order) compared to two toggles.
+- **Settings panel.** Interactive `SettingsList` modal with live preview instead of separate toggle commands.
+- **Colored segments.** Footer renders usage percentages, separators, and account labels in distinct colors matched to the terminal theme.
+- **Model-aware display.** Footer clears when switching to non-Codex models and debounces rapid model changes.
