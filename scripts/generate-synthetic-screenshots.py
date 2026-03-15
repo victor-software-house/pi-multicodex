@@ -12,9 +12,11 @@ from PIL import Image, ImageDraw, ImageFont
 
 OUTPUT_DIR = Path("assets/screenshots")
 
-# Palette aligned to the control-sequence samples provided in chat.
-BG = (26, 28, 36)
-DEFAULT = (222, 224, 228)
+# Palette aligned to your control-sequence samples + current iTerm2 profile.
+# iTerm2 Default profile background: #141414 (20, 20, 20)
+BG = (20, 20, 20)
+# iTerm2 Default profile foreground: #FFFFD4 (255, 255, 212)
+DEFAULT = (255, 255, 212)
 ACCENT = (225, 196, 125)  # 38:2:1:225:196:125
 DIM = (75, 75, 75)  # 38:2:1:75:75:75
 SUCCESS = (166, 211, 147)  # 38:2:1:166:211:147
