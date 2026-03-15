@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/victor-founder/pi-multicodex/compare/v2.0.1...v2.0.2) (2026-03-15)
+
+
+### Bug Fixes
+
+* correct pi repository link in README ([0e31607](https://github.com/victor-founder/pi-multicodex/commit/0e31607351aea755f5be018d1175349f05a3478f))
+
 ## [2.0.1](https://github.com/victor-founder/pi-multicodex/compare/v2.0.0...v2.0.1) (2026-03-15)
 
 
