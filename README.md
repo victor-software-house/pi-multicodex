@@ -13,6 +13,14 @@
 - otherwise prefers the account whose weekly window resets first
 - keeps the implementation focused on Codex account rotation
 
+## Why teams pick it
+
+- one operator command family instead of scattered commands (`/multicodex ...`)
+- account operations are fast in-session (`/multicodex use` picker with `Backspace` remove + confirmation)
+- non-UI operations are available for inspection and recovery (`show`, `verify`, `path`, `reset`, `help`)
+- settings and account state use stable local paths under `~/.pi/agent/`
+- release and quality checks are automated through CI and semantic-release
+
 ## Install
 
 ```bash

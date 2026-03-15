@@ -84,9 +84,9 @@ The extension now uses one operator command family.
 - README, ROADMAP, tests, and command implementation were updated in the same change.
 - The command migration remains a user-facing breaking change and should be released accordingly.
 
-## Current milestone — command-family migration and operator UX
+## Completed milestone — command-family migration and operator UX
 
-Goal: replace the split command surface with one coherent operator API and make the extension operable from both UI and non-UI flows.
+Outcome: the split command surface was replaced with one coherent operator API that works in both UI and non-UI flows.
 
 ### Work items
 
