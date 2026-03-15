@@ -24,6 +24,7 @@ import type {
 import { createLinkedAbortController } from "./abort-utils";
 import { AccountManager } from "./account-manager";
 import { registerCommands } from "./commands";
+import { handleNewSessionSwitch, handleSessionStart } from "./hooks";
 
 // =============================================================================
 // Helpers
@@ -188,16 +189,7 @@ export default function multicodexExtension(pi: ExtensionAPI) {
 	// Hooks
 	pi.on("session_start", (_event: unknown, ctx: ExtensionContext) => {
 		lastContext = ctx;
-		if (accountManager.getAccounts().length === 0) return;
-		void (async () => {
-			await accountManager.refreshUsageForAllAccounts({ force: true });
-			const manual = accountManager.getAvailableManualAccount();
-			if (manual) return;
-			if (accountManager.hasManualAccount()) {
-				accountManager.clearManualAccount();
-			}
-			await accountManager.activateBestAccount();
-		})();
+		handleSessionStart(accountManager);
 	});
 
 	pi.on(
@@ -205,15 +197,7 @@ export default function multicodexExtension(pi: ExtensionAPI) {
 		(event: { reason?: string }, ctx: ExtensionContext) => {
 			lastContext = ctx;
 			if (event.reason === "new") {
-				void (async () => {
-					await accountManager.refreshUsageForAllAccounts({ force: true });
-					const manual = accountManager.getAvailableManualAccount();
-					if (manual) return;
-					if (accountManager.hasManualAccount()) {
-						accountManager.clearManualAccount();
-					}
-					await accountManager.activateBestAccount();
-				})();
+				handleNewSessionSwitch(accountManager);
 			}
 		},
 	);
