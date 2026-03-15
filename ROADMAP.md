@@ -126,6 +126,17 @@ Goal: improve everyday usability for multi-account management.
 - [ ] Improve the status output for account state, cooldowns, and manual selection
 - [ ] Make active-account information easier to understand during a session
 
+## Final release validation
+
+Before the next real release, explicitly validate the full release path:
+
+- [ ] Run `pnpm check`
+- [ ] Run `npm pack --dry-run`
+- [ ] Create and push the release tag
+- [ ] Verify the GitHub Actions trusted-publishing workflow completes successfully
+- [ ] Verify the new version is available on npmjs
+- [ ] Verify install or upgrade in pi from the published package
+
 ## Non-goals for now
 
 - [ ] No cross-provider account orchestration
