@@ -10,7 +10,7 @@ echo "[pre-push] running CI-equivalent checks"
 mise x -- pnpm check
 mise x -- npm pack --dry-run >/dev/null
 
-while read -r _local_ref local_sha _remote_ref _remote_sha; do
+while read -r local_ref local_sha _remote_ref _remote_sha; do
   if [[ "$local_sha" == "0000000000000000000000000000000000000000" ]]; then
     continue
   fi
