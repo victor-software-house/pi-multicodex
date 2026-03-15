@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/victor-founder/pi-multicodex/compare/v2.0.0...v2.0.1) (2026-03-15)
+
+
+### Bug Fixes
+
+* trigger patch release for updated screenshot assets ([83c1008](https://github.com/victor-founder/pi-multicodex/commit/83c10080539239898413f7f934fcd9fe4ee4e981))
+
 # Changelog
 
 All notable changes to this project are documented in this file.
