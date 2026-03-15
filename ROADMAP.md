@@ -95,14 +95,15 @@ The footer-polish work now covers:
 
 ## Suggested implementation order for the next session
 
-1. Start the behavior-contract documentation milestone.
-2. Improve `/multicodex-use` picker and select-or-login flow.
-3. Improve `/multicodex-status` output for active state, cooldowns, and manual override visibility.
-4. Revisit footer colors only if real usage feedback shows readability issues.
+1. Allow choosing an account directly from the status panel as an alias for `/multicodex-use`.
+2. Replace imported-account fallback labels with real email identity when it can be derived safely.
+3. Improve `/multicodex-use` picker and select-or-login flow.
+4. Improve `/multicodex-status` output for active state, cooldowns, and manual override visibility.
+5. Start the behavior-contract documentation milestone for configurable rotation criteria.
 
 ## Follow-up milestone — behavior contract
 
-Goal: make account rotation behavior explicit and documented.
+Goal: make account rotation behavior explicit, configurable, and documented.
 
 - [ ] Define account selection priority
 - [ ] Define quota exhaustion semantics
@@ -113,11 +114,16 @@ Goal: make account rotation behavior explicit and documented.
 - [ ] Define cache TTL and refresh rules
 - [ ] Define error classification rules
 - [ ] Document the behavior contract in README or a dedicated doc
+- [ ] Add configurable rotation criteria instead of hard-coding the current selection rules
+- [ ] Add a panel to configure provider rotation criteria and selection preferences
+- [ ] Persist rotation criteria in settings and apply them to account selection
 
 ## Follow-up milestone — UX improvements
 
 Goal: improve everyday usability for multi-account management.
 
+- [ ] Allow choosing an account directly from the status panel as an alias for `/multicodex-use`
+- [ ] Replace imported-account fallback labels with real email identity when it can be derived safely
 - [ ] Improve the `/multicodex-use` account picker and select-or-login flow
 - [ ] Improve the status output for account state, cooldowns, and manual selection
 - [ ] Make active-account information easier to understand during a session
