@@ -32,7 +32,8 @@ The roadmap is centered on:
 - **Scope:** Codex only
 - **Local package manager:** pnpm
 - **Primary release path:** npmjs with trusted publishing
-- **Current storage filename target:** `codex-accounts.json`
+- **Current storage filename:** `codex-accounts.json`
+- **Local state path:** `~/.pi/agent/codex-accounts.json`
 
 ## Release discipline
 
@@ -51,45 +52,50 @@ Target release flow:
 4. Create and push a matching `v*` tag.
 5. Let GitHub Actions publish through trusted publishing.
 
-## Milestone 1 — storage identity
+## Completed foundation work
 
-Goal: give the package a stable, self-owned local data file and tighten the storage model.
+### Storage identity
 
-- [ ] Replace the current state path with `~/.pi/agent/codex-accounts.json`
-- [ ] Keep the on-disk format as JSON unless there is a clear reason to split state and secrets
-- [ ] Review exactly which fields belong in the local state file
-- [ ] Decide whether secret material should remain in JSON state or move to a safer storage mechanism later
-- [ ] Document the storage path and storage expectations
+Completed:
 
-Notes:
+- [x] Use `~/.pi/agent/codex-accounts.json`
+- [x] Keep the on-disk format as JSON for now
+- [x] Document the storage path in the repo docs
+- [x] Avoid adding custom encryption
 
-- JSON is acceptable for local state because it is simple, debuggable, and already consistent with pi's surrounding file-based configuration model.
-- If stronger protection is needed later, use platform-backed secure storage or a well-supported secret-management layer instead of inventing custom encryption.
+### Internal modularization
 
-## Milestone 2 — internal modularization
+Completed:
 
-Goal: reduce maintenance cost by splitting the large root implementation into focused modules.
+- [x] Thin `index.ts` into a public export surface
+- [x] Split account management into focused modules
+- [x] Split provider, stream wrapper, command, hook, storage, usage, and browser helpers
+- [x] Keep behavior stable during refactoring
 
-Target structure:
+### Baseline test coverage
 
-- [ ] `src/index.ts` or a thin root `index.ts`
-- [ ] `src/storage.ts`
-- [ ] `src/accounts.ts`
-- [ ] `src/usage.ts`
-- [ ] `src/selection.ts`
-- [ ] `src/provider.ts`
-- [ ] `src/commands.ts`
-- [ ] `src/oauth.ts`
-- [ ] `src/errors.ts`
+Completed:
 
-Tests to add or split:
+- [x] Cover usage parsing and reset helpers
+- [x] Cover account selection behavior
+- [x] Cover manual-account stream-wrapper behavior
+- [x] Cover extension wiring and hook routing
+- [x] Run all tests through Vitest with `*.test.ts`
 
-- [ ] `selection.test.ts`
-- [ ] `usage.test.ts`
-- [ ] `storage.test.ts`
-- [ ] `provider.test.ts`
+## Next milestone — active-account usage visibility
 
-## Milestone 3 — behavior contract
+Goal: surface usage information for the currently active account directly in pi.
+
+Planned work:
+
+- [ ] Integrate the ideas or code path from `calesennett/pi-codex-usage`
+- [ ] Display footer usage only when the active model is authenticated through this extension's provider override
+- [ ] Ensure the usage shown belongs to the currently selected active account
+- [ ] Display the logged-in account identifier beside the usage metrics
+- [ ] Reuse or adapt a refresh model that stays responsive without excessive polling
+- [ ] Keep the feature scoped to this extension's managed accounts rather than global Codex auth state
+
+## Follow-up milestone — behavior contract
 
 Goal: make account rotation behavior explicit and documented.
 
@@ -103,20 +109,7 @@ Goal: make account rotation behavior explicit and documented.
 - [ ] Define error classification rules
 - [ ] Document the behavior contract in README or a dedicated doc
 
-## Milestone 4 — active-account usage visibility
-
-Goal: surface usage information for the currently active account directly in pi.
-
-Planned follow-up:
-
-- [ ] Integrate the ideas or code path from `calesennett/pi-codex-usage`
-- [ ] Display footer usage only when the active model is authenticated through this extension's provider override
-- [ ] Ensure the usage shown belongs to the currently selected active account
-- [ ] Display the logged-in account identifier beside the usage metrics
-- [ ] Reuse or adapt a refresh model that stays responsive without excessive polling
-- [ ] Keep the feature scoped to this extension's managed accounts rather than global Codex auth state
-
-## Milestone 5 — UX improvements
+## Follow-up milestone — UX improvements
 
 Goal: improve everyday usability for multi-account management.
 
@@ -136,6 +129,7 @@ Before the next real release, explicitly validate the full release path:
 - [ ] Verify the GitHub Actions trusted-publishing workflow completes successfully
 - [ ] Verify the new version is available on npmjs
 - [ ] Verify install or upgrade in pi from the published package
+- [ ] Verify the published tarball includes every runtime TypeScript module the extension imports
 
 ## Non-goals for now
 
@@ -143,17 +137,3 @@ Before the next real release, explicitly validate the full release path:
 - [ ] No attempt to become a generic auth manager for pi
 - [ ] No custom encryption implementation for local secrets
 - [ ] No Bun-first consumer install story
-
-## Immediate next milestone
-
-Recommended next step:
-
-**Storage identity**
-
-Success criteria:
-
-- storage path updated to `~/.pi/agent/codex-accounts.json`
-- tests still pass
-- local behavior remains stable
-- docs mention the storage path clearly
-- no custom crypto added

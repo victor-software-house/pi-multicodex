@@ -61,8 +61,12 @@ Current direction:
 - package name: `@victor-software-house/pi-multicodex`
 - Codex-only scope
 - local state stored at `~/.pi/agent/codex-accounts.json`
-- independent storage and release policy
+- internal logic split into focused modules
 - current roadmap tracked in `ROADMAP.md`
+
+Current next step:
+
+- add active-account usage visibility in pi for this extension's managed Codex accounts
 
 ## Release validation
 

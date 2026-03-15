@@ -2,22 +2,19 @@
 
 ## Scope
 
-Only edit files in this directory:
-
-```
-~/.pi/agent/extensions/multicodex/
-```
+Only edit files in this repository.
 
 ## Goals
 
 - Keep the extension runnable when installed outside the pi monorepo.
 - Avoid deep imports that resolve to repo-local paths.
 - Keep runtime behavior compatible with pi extension docs.
+- Keep the published package self-contained, including all runtime TypeScript modules it imports.
 
 ## Type Safety
 
 - Use public exports from `@mariozechner/pi-ai` and `@mariozechner/pi-coding-agent`.
-- The local `pi-coding-agent.d.ts` module augmentation is for TypeScript only and must stay minimal.
+- Prefer small focused modules with explicit exports over large shared files.
 
 ## Checks
 
