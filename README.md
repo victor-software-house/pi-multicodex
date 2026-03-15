@@ -60,7 +60,7 @@ Current direction:
 
 - package name: `@victor-software-house/pi-multicodex`
 - Codex-only scope
-- local state stored at `~/.pi/agent/pi-multicodex.json`
+- local state stored at `~/.pi/agent/codex-accounts.json`
 - independent storage and release policy
 - current roadmap tracked in `ROADMAP.md`
 

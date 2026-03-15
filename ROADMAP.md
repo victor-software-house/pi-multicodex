@@ -32,7 +32,7 @@ The roadmap is centered on:
 - **Scope:** Codex only
 - **Local package manager:** pnpm
 - **Primary release path:** npmjs with trusted publishing
-- **Current storage filename target:** `pi-multicodex.json`
+- **Current storage filename target:** `codex-accounts.json`
 
 ## Release discipline
 
@@ -55,7 +55,7 @@ Target release flow:
 
 Goal: give the package a stable, self-owned local data file and tighten the storage model.
 
-- [x] Replace `~/.pi/agent/multicodex.json` with `~/.pi/agent/pi-multicodex.json`
+- [ ] Replace the current state path with `~/.pi/agent/codex-accounts.json`
 - [ ] Keep the on-disk format as JSON unless there is a clear reason to split state and secrets
 - [ ] Review exactly which fields belong in the local state file
 - [ ] Decide whether secret material should remain in JSON state or move to a safer storage mechanism later
@@ -66,17 +66,7 @@ Notes:
 - JSON is acceptable for local state because it is simple, debuggable, and already consistent with pi's surrounding file-based configuration model.
 - If stronger protection is needed later, use platform-backed secure storage or a well-supported secret-management layer instead of inventing custom encryption.
 
-## Milestone 2 — release-path validation
-
-Goal: verify that the published package and trusted-publishing setup work end to end.
-
-- [ ] Test install in pi from npmjs
-- [ ] Verify command availability after install
-- [ ] Perform the first fully tag-driven trusted-publishing release
-- [ ] Confirm the release path works without manual publish fallbacks
-- [ ] Document the final release checklist in concise form
-
-## Milestone 3 — internal modularization
+## Milestone 2 — internal modularization
 
 Goal: reduce maintenance cost by splitting the large root implementation into focused modules.
 
@@ -99,7 +89,7 @@ Tests to add or split:
 - [ ] `storage.test.ts`
 - [ ] `provider.test.ts`
 
-## Milestone 4 — behavior contract
+## Milestone 3 — behavior contract
 
 Goal: make account rotation behavior explicit and documented.
 
@@ -113,7 +103,7 @@ Goal: make account rotation behavior explicit and documented.
 - [ ] Define error classification rules
 - [ ] Document the behavior contract in README or a dedicated doc
 
-## Milestone 5 — active-account usage visibility
+## Milestone 4 — active-account usage visibility
 
 Goal: surface usage information for the currently active account directly in pi.
 
@@ -126,7 +116,7 @@ Planned follow-up:
 - [ ] Reuse or adapt a refresh model that stays responsive without excessive polling
 - [ ] Keep the feature scoped to this extension's managed accounts rather than global Codex auth state
 
-## Milestone 6 — UX improvements
+## Milestone 5 — UX improvements
 
 Goal: improve everyday usability for multi-account management.
 
@@ -151,7 +141,7 @@ Recommended next step:
 
 Success criteria:
 
-- storage path updated to `~/.pi/agent/pi-multicodex.json`
+- storage path updated to `~/.pi/agent/codex-accounts.json`
 - tests still pass
 - local behavior remains stable
 - docs mention the storage path clearly

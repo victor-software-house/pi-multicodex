@@ -320,7 +320,7 @@ const STORAGE_FILE = path.join(
 	os.homedir(),
 	".pi",
 	"agent",
-	"pi-multicodex.json",
+	"codex-accounts.json",
 );
 const PROVIDER_ID = "multicodex";
 const QUOTA_COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
