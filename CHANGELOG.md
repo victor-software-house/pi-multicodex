@@ -1,3 +1,10 @@
+## [2.0.7](https://github.com/victor-software-house/pi-multicodex/compare/v2.0.6...v2.0.7) (2026-03-16)
+
+
+### Bug Fixes
+
+* update asset paths after screenshots folder removal ([92ac386](https://github.com/victor-software-house/pi-multicodex/commit/92ac386bf8328135613aed284c958e297b116764))
+
 ## [2.0.6](https://github.com/victor-software-house/pi-multicodex/compare/v2.0.5...v2.0.6) (2026-03-15)
 
 
