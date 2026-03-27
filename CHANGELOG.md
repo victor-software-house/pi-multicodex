@@ -1,3 +1,10 @@
+## [2.0.9](https://github.com/victor-software-house/pi-multicodex/compare/v2.0.8...v2.0.9) (2026-03-27)
+
+
+### Bug Fixes
+
+* delegate imported account refresh to AuthStorage to prevent race with pi ([7b287b1](https://github.com/victor-software-house/pi-multicodex/commit/7b287b1f4f738edd1a295acd85964495046a31a6))
+
 ## [2.0.8](https://github.com/victor-software-house/pi-multicodex/compare/v2.0.7...v2.0.8) (2026-03-27)
 
 
