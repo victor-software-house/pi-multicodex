@@ -14,8 +14,8 @@ import {
 	SelectList,
 	Text,
 } from "@mariozechner/pi-tui";
-import { getAgentSettingsPath } from "@victor-software-house/pi-provider-utils/agent-paths";
-import { normalizeUnknownError } from "@victor-software-house/pi-provider-utils/streams";
+import { getAgentSettingsPath } from "pi-provider-utils/agent-paths";
+import { normalizeUnknownError } from "pi-provider-utils/streams";
 import type { AccountManager } from "./account-manager";
 import { openLoginInBrowser } from "./browser";
 import type { createUsageStatusController } from "./status";

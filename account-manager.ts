@@ -2,7 +2,7 @@ import {
 	type OAuthCredentials,
 	refreshOpenAICodexToken,
 } from "@mariozechner/pi-ai/oauth";
-import { normalizeUnknownError } from "@victor-software-house/pi-provider-utils/streams";
+import { normalizeUnknownError } from "pi-provider-utils/streams";
 import { loadImportedOpenAICodexAuth } from "./auth";
 import { isAccountAvailable, pickBestAccount } from "./selection";
 import {

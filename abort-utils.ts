@@ -6,4 +6,4 @@
 export {
 	createLinkedAbortController,
 	createTimeoutController,
-} from "@victor-software-house/pi-provider-utils/streams";
+} from "pi-provider-utils/streams";

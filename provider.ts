@@ -1,5 +1,5 @@
 import { getApiProvider } from "@mariozechner/pi-ai";
-import { mirrorProvider } from "@victor-software-house/pi-provider-utils/providers";
+import { mirrorProvider } from "pi-provider-utils/providers";
 import type { AccountManager } from "./account-manager";
 import { createStreamWrapper } from "./stream-wrapper";
 

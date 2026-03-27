@@ -1,6 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { getAgentPath } from "@victor-software-house/pi-provider-utils/agent-paths";
+import { getAgentPath } from "pi-provider-utils/agent-paths";
 
 export interface Account {
 	email: string;

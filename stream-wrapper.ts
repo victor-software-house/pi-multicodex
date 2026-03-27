@@ -12,7 +12,7 @@ import {
 	createLinkedAbortController,
 	normalizeUnknownError,
 	rewriteProviderOnEvent,
-} from "@victor-software-house/pi-provider-utils/streams";
+} from "pi-provider-utils/streams";
 import type { AccountManager } from "./account-manager";
 import { isQuotaErrorMessage } from "./quota";
 

@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      pi-provider-utils:
+        specifier: ^0.0.0
+        version: 0.0.0(@mariozechner/pi-ai@0.63.1(ws@8.19.0)(zod@4.3.6))(@mariozechner/pi-coding-agent@0.63.1(ws@8.19.0)(zod@4.3.6))
     devDependencies:
       '@biomejs/biome':
         specifier: ^2.4.7
@@ -50,9 +54,6 @@ importers:
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20260314.1
         version: 7.0.0-dev.20260314.1
-      '@victor-software-house/pi-provider-utils':
-        specifier: link:../pi-provider-utils
-        version: link:../pi-provider-utils
       semantic-release:
         specifier: ^25.0.3
         version: 25.0.3(typescript@5.9.3)
@@ -2278,6 +2279,13 @@ packages:
 
   pend@1.2.0:
     resolution: {integrity: sha512-F3asv42UuXchdzt+xXqfW1OGlVBe+mxa2mqI0pg5yAHZPvFmY3Y6drSf/GQ1A86WgWEN9Kzh/WrgKa6iGcHXLg==}
+
+  pi-provider-utils@0.0.0:
+    resolution: {integrity: sha512-dAvnI1HuhQesEWlIp1yHEHmlaEX7gKxA8b5VZuLC8hIK2+o1cNiHhKRG1cs+cNK0M9+7gSUc2Z8wC3duSf/oxg==}
+    engines: {node: 24.14.0}
+    peerDependencies:
+      '@mariozechner/pi-ai': '*'
+      '@mariozechner/pi-coding-agent': '*'
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -5365,6 +5373,11 @@ snapshots:
   pathe@2.0.3: {}
 
   pend@1.2.0: {}
+
+  pi-provider-utils@0.0.0(@mariozechner/pi-ai@0.63.1(ws@8.19.0)(zod@4.3.6))(@mariozechner/pi-coding-agent@0.63.1(ws@8.19.0)(zod@4.3.6)):
+    dependencies:
+      '@mariozechner/pi-ai': 0.63.1(ws@8.19.0)(zod@4.3.6)
+      '@mariozechner/pi-coding-agent': 0.63.1(ws@8.19.0)(zod@4.3.6)
 
   picocolors@1.1.1: {}
 
