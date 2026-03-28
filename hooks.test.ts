@@ -40,6 +40,7 @@ describe("handleSessionStart", () => {
 			getAccounts: () => [{ email: "a@example.com" }],
 			syncImportedOpenAICodexAuth,
 			refreshUsageForAllAccounts,
+			getAccountsNeedingReauth: () => [],
 			getAvailableManualAccount,
 			hasManualAccount,
 			clearManualAccount,
@@ -70,6 +71,7 @@ describe("handleSessionStart", () => {
 			getAccounts: () => [{ email: "manual@example.com" }],
 			syncImportedOpenAICodexAuth,
 			refreshUsageForAllAccounts,
+			getAccountsNeedingReauth: () => [],
 			getAvailableManualAccount,
 			hasManualAccount,
 			clearManualAccount,
@@ -99,6 +101,7 @@ describe("handleNewSessionSwitch", () => {
 		handleNewSessionSwitch({
 			syncImportedOpenAICodexAuth,
 			refreshUsageForAllAccounts,
+			getAccountsNeedingReauth: () => [],
 			getAvailableManualAccount,
 			hasManualAccount,
 			clearManualAccount,

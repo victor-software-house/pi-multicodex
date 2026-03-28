@@ -12,6 +12,7 @@ export interface Account {
 	quotaExhaustedUntil?: number;
 	importSource?: "pi-openai-codex";
 	importFingerprint?: string;
+	needsReauth?: boolean;
 }
 
 export interface StorageData {

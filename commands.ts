@@ -80,11 +80,16 @@ function parseResetTarget(value: string): ResetTarget | undefined {
 	return undefined;
 }
 
-function getAccountLabel(email: string, quotaExhaustedUntil?: number): string {
-	if (!quotaExhaustedUntil || quotaExhaustedUntil <= Date.now()) {
-		return email;
-	}
-	return `${email} (Quota)`;
+function getAccountLabel(
+	email: string,
+	options?: { quotaExhaustedUntil?: number; needsReauth?: boolean },
+): string {
+	const tags: string[] = [];
+	if (options?.needsReauth) tags.push("Reauth");
+	if (options?.quotaExhaustedUntil && options.quotaExhaustedUntil > Date.now())
+		tags.push("Quota");
+	if (tags.length === 0) return email;
+	return `${email} (${tags.join(", ")})`;
 }
 
 function formatAccountStatusLine(
@@ -100,9 +105,11 @@ function formatAccountStatusLine(
 		account.quotaExhaustedUntil && account.quotaExhaustedUntil > Date.now();
 	const untouched = isUsageUntouched(usage) ? "untouched" : null;
 	const imported = account.importSource ? "imported" : null;
+	const reauth = account.needsReauth ? "needs reauth" : null;
 	const tags = [
 		active?.email === account.email ? "active" : null,
 		manual?.email === account.email ? "manual" : null,
+		reauth,
 		quotaHit ? "quota" : null,
 		untouched,
 		imported,
@@ -234,7 +241,10 @@ async function openAccountSelectionPanel(
 	const accounts = accountManager.getAccounts();
 	const items = accounts.map((account) => ({
 		value: account.email,
-		label: getAccountLabel(account.email, account.quotaExhaustedUntil),
+		label: getAccountLabel(account.email, {
+			quotaExhaustedUntil: account.quotaExhaustedUntil,
+			needsReauth: account.needsReauth,
+		}),
 	}));
 
 	return ctx.ui.custom<AccountPanelResult>((_tui, theme, _kb, done) => {

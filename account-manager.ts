@@ -80,6 +80,7 @@ export class AccountManager {
 			existing.expiresAt = creds.expires;
 			existing.importSource = options?.importSource;
 			existing.importFingerprint = options?.importFingerprint;
+			existing.needsReauth = undefined;
 			if (accountId) {
 				existing.accountId = accountId;
 			}
@@ -231,10 +232,22 @@ export class AccountManager {
 		return this.usageCache.get(email);
 	}
 
+	getAccountsNeedingReauth(): Account[] {
+		return this.data.accounts.filter((a) => a.needsReauth);
+	}
+
+	private markNeedsReauth(account: Account): void {
+		account.needsReauth = true;
+		this.save();
+		this.notifyStateChanged();
+	}
+
 	async refreshUsageForAccount(
 		account: Account,
 		options?: { force?: boolean; signal?: AbortSignal },
 	): Promise<CodexUsageSnapshot | undefined> {
+		if (account.needsReauth) return this.usageCache.get(account.email);
+
 		const cached = this.usageCache.get(account.email);
 		const now = Date.now();
 		if (
@@ -340,6 +353,15 @@ export class AccountManager {
 	}
 
 	async ensureValidToken(account: Account): Promise<string> {
+		if (account.needsReauth) {
+			const hint = account.importSource
+				? "/login openai-codex"
+				: `/multicodex use ${account.email}`;
+			throw new Error(
+				`${account.email}: re-authentication required — run ${hint}`,
+			);
+		}
+
 		if (Date.now() < account.expiresAt - 5 * 60 * 1000) {
 			return account.accessToken;
 		}
@@ -369,6 +391,9 @@ export class AccountManager {
 				this.save();
 				this.notifyStateChanged();
 				return account.accessToken;
+			} catch (error) {
+				this.markNeedsReauth(account);
+				throw error;
 			} finally {
 				this.refreshPromises.delete(account.email);
 			}
@@ -410,11 +435,17 @@ export class AccountManager {
 
 		// Both our copy and auth.json are expired — let AuthStorage refresh with
 		// its file lock so only one caller (us or pi) fires the API call.
-		const authStorage = AuthStorage.create();
-		const apiKey = await authStorage.getApiKey("openai-codex");
+		let apiKey: string | undefined;
+		try {
+			const authStorage = AuthStorage.create();
+			apiKey = await authStorage.getApiKey("openai-codex");
+		} catch {
+			// AuthStorage refresh failed; mark for re-auth below.
+		}
 		if (!apiKey) {
+			this.markNeedsReauth(account);
 			throw new Error(
-				"OpenAI Codex: token refresh failed — please re-authenticate with /login",
+				`${account.email}: token refresh failed — run /login openai-codex to re-authenticate`,
 			);
 		}
 

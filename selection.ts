@@ -6,6 +6,7 @@ import {
 } from "./usage";
 
 export function isAccountAvailable(account: Account, now: number): boolean {
+	if (account.needsReauth) return false;
 	return !account.quotaExhaustedUntil || account.quotaExhaustedUntil <= now;
 }
 
