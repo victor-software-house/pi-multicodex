@@ -60,12 +60,17 @@ describe("getOpenAICodexMirror", () => {
 describe("buildMulticodexProviderConfig", () => {
 	it("uses mirrored models and baseUrl", () => {
 		const mirror = getOpenAICodexMirror();
-		const config = buildMulticodexProviderConfig(
-			{} as unknown as AccountManager,
-		);
+		const fakeManager = {
+			getActiveAccount: () => ({
+				accessToken: "test-jwt.eyJ0ZXN0IjoxfQ.sig",
+				needsReauth: false,
+			}),
+			getAccounts: () => [],
+		} as unknown as AccountManager;
+		const config = buildMulticodexProviderConfig(fakeManager);
 
 		expect(config.api).toBe("openai-codex-responses");
-		expect(config.apiKey).toBe("managed-by-extension");
+		expect(config.apiKey).toBe("test-jwt.eyJ0ZXN0IjoxfQ.sig");
 		expect(config.baseUrl).toBe(mirror.baseUrl);
 		expect(config.models).toEqual(mirror.models);
 		expect(typeof config.streamSimple).toBe("function");

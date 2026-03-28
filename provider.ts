@@ -42,6 +42,22 @@ export function getOpenAICodexMirror(): {
 	};
 }
 
+function getActiveApiKey(accountManager: AccountManager): string {
+	const active = accountManager.getActiveAccount();
+	if (active && !active.needsReauth) {
+		return active.accessToken;
+	}
+	// Fallback: first available account with a valid token.
+	for (const account of accountManager.getAccounts()) {
+		if (!account.needsReauth && account.accessToken) {
+			return account.accessToken;
+		}
+	}
+	// Placeholder — AuthStorage will override on every actual API call
+	// as long as auth.json has valid tokens.
+	return "pending-login";
+}
+
 export function buildMulticodexProviderConfig(accountManager: AccountManager) {
 	const mirror = getOpenAICodexMirror();
 	const baseProvider = getApiProvider("openai-codex-responses");
@@ -53,7 +69,7 @@ export function buildMulticodexProviderConfig(accountManager: AccountManager) {
 
 	return {
 		baseUrl: mirror.baseUrl,
-		apiKey: "managed-by-extension",
+		apiKey: getActiveApiKey(accountManager),
 		api: "openai-codex-responses" as const,
 		streamSimple: createStreamWrapper(accountManager, baseProvider),
 		models: mirror.models,
