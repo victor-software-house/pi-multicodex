@@ -4,7 +4,10 @@ import {
 } from "@mariozechner/pi-ai/oauth";
 import { AuthStorage } from "@mariozechner/pi-coding-agent";
 import { normalizeUnknownError } from "pi-provider-utils/streams";
-import { loadImportedOpenAICodexAuth } from "./auth";
+import {
+	loadImportedOpenAICodexAuth,
+	writeActiveTokenToAuthJson,
+} from "./auth";
 import { isAccountAvailable, pickBestAccount } from "./selection";
 import {
 	type Account,
@@ -42,6 +45,19 @@ export class AccountManager {
 		for (const handler of this.stateChangeHandlers) {
 			handler();
 		}
+	}
+
+	/**
+	 * Write the active account's tokens to auth.json so pi's background features
+	 * (rename, compaction) can resolve a valid API key via AuthStorage.
+	 */
+	private syncActiveTokenToAuthJson(account: Account): void {
+		writeActiveTokenToAuthJson({
+			access: account.accessToken,
+			refresh: account.refreshToken,
+			expires: account.expiresAt,
+			accountId: account.accountId,
+		}).catch(() => {});
 	}
 
 	onStateChange(handler: StateChangeHandler): () => void {
@@ -363,6 +379,7 @@ export class AccountManager {
 		}
 
 		if (Date.now() < account.expiresAt - 5 * 60 * 1000) {
+			this.syncActiveTokenToAuthJson(account);
 			return account.accessToken;
 		}
 
@@ -390,6 +407,7 @@ export class AccountManager {
 				}
 				this.save();
 				this.notifyStateChanged();
+				this.syncActiveTokenToAuthJson(account);
 				return account.accessToken;
 			} catch (error) {
 				this.markNeedsReauth(account);

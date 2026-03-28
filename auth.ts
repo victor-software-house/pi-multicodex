@@ -85,6 +85,39 @@ export function parseImportedOpenAICodexAuth(
 	};
 }
 
+/**
+ * Write the active account's tokens to auth.json so pi's background features
+ * (rename, compaction, inline suggestions) can resolve a valid API key through
+ * the normal AuthStorage path.
+ */
+export async function writeActiveTokenToAuthJson(creds: {
+	access: string;
+	refresh: string;
+	expires: number;
+	accountId?: string;
+}): Promise<void> {
+	let auth: Record<string, unknown> = {};
+	try {
+		const raw = await fs.readFile(AUTH_FILE, "utf8");
+		const parsed = JSON.parse(raw) as unknown;
+		if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+			auth = parsed as Record<string, unknown>;
+		}
+	} catch {
+		// File missing or corrupt — start fresh.
+	}
+
+	auth["openai-codex"] = {
+		type: "oauth",
+		access: creds.access,
+		refresh: creds.refresh,
+		expires: creds.expires,
+		accountId: creds.accountId,
+	};
+
+	await fs.writeFile(AUTH_FILE, JSON.stringify(auth, null, 2));
+}
+
 export async function loadImportedOpenAICodexAuth(): Promise<
 	ImportedOpenAICodexAuth | undefined
 > {
